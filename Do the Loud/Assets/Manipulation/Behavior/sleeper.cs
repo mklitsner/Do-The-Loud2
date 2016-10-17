@@ -81,7 +81,7 @@ public class sleeper : MonoBehaviour {
 			//Rise up
 			
 		} else {
-			Debug.Log ("sleeper lost state");
+			//Debug.Log ("sleeper lost state");
 		}
 
 
@@ -89,6 +89,6 @@ public class sleeper : MonoBehaviour {
 
 
 
-		Debug.Log (Time.time);
+		//Debug.Log (Time.time);
 	}
 }
