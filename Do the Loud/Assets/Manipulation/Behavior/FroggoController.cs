@@ -27,6 +27,7 @@ public class FroggoController : MonoBehaviour {
 
 		transform.rotation = rot;
 		transform.eulerAngles = new Vector3 (90,transform.eulerAngles.y, transform.eulerAngles.z);
+		transform.position = new Vector3 (transform.position.x,0, transform.position.z);
 
 		
 	}
