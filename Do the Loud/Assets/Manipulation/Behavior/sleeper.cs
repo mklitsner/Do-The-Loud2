@@ -8,6 +8,7 @@ public class sleeper : MonoBehaviour {
 	enum State {asleep,dozing,idle,waking,enlightened};
 	private Animator animator;
 	public float sleepTimer;
+	private Color spriteColor;
 
 
 	//wakingTimer counts down from the last time its been yelled at
@@ -16,6 +17,7 @@ public class sleeper : MonoBehaviour {
 	float resistance;
 	float floatation;
 	private SpriteRenderer sprite;
+	AudioClip dreamSong;
 
 	bool yelledAt;
 
@@ -24,7 +26,13 @@ public class sleeper : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 
+		spriteColor = new Color (Random.Range(.55f,.65f), Random.Range(.65f,.8f),Random.Range(.75f,.9f), 1);
+
+			GetComponent<SpriteRenderer>().color=spriteColor;
+
 		//Music play
+		dreamSong=GetComponent<AudioSource> ().clip;
+
 
 		AudioSource audio = GetComponent<AudioSource>();
 
@@ -65,8 +73,7 @@ public class sleeper : MonoBehaviour {
 			if (sleepTimer < 20) {
 				_sleeperState = State.dozing;
 			}
-
-			//if collided with partner is found, become enlightened
+				
 			
 
 		} else if (_sleeperState == State.waking) {
@@ -120,6 +127,7 @@ public class sleeper : MonoBehaviour {
 			//if sleepTimer goes below 0, fall
 			if (sleepTimer < 0) {
 				floatation = sleepTimer;
+				GetComponent<SpriteRenderer>().color = Color.Lerp(spriteColor,new Color(0.15f,0.22f,0.27f,1),floatation*-.06f);
 				sprite.sortingLayerName = "Below";
 				if (floatation < -20) {
 					Destroy (gameObject);
@@ -140,6 +148,14 @@ public class sleeper : MonoBehaviour {
 			
 		} else if (_sleeperState == State.enlightened) {
 			//Rise up
+			floatation +=0.1f;
+			animator.SetInteger ("AnimState", 3);
+			sprite.sortingLayerName = "Above";
+			GetComponent<SpriteRenderer>().color = Color.Lerp(spriteColor,new Color(1,0.93f,0.25f,1),floatation*.1f);
+			if (floatation > 20) {
+				Destroy (gameObject);
+			}
+
 			
 		} else {
 			//Debug.Log ("sleeper lost state");
@@ -152,7 +168,19 @@ public class sleeper : MonoBehaviour {
 			wakingTimer = 0.5f;
 			Debug.Log ("yelledAt");
 		}
+
 	}
+
+	void OnTriggerEnter(Collider col){
+	if (col.gameObject.tag == "Sleeper") {
+			if (col.GetComponent<AudioSource> ().clip == dreamSong) {
+				_sleeperState = State.enlightened;
+			}
+			Debug.Log (col.GetComponent<AudioSource> ().clip + " and " + dreamSong);
+		}
+	}
+
+
 		
 		
 
