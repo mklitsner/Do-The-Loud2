@@ -1,11 +1,15 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.Audio;
+[RequireComponent(typeof(AudioSource))]
 
 public class sleeper : MonoBehaviour {
 
 	enum State {asleep,dozing,idle,waking,enlightened};
 	private Animator animator;
 	public float sleepTimer;
+
+
 	//wakingTimer counts down from the last time its been yelled at
 	float wakingTimer;
 	public float timerAverageStart;//50
@@ -19,6 +23,16 @@ public class sleeper : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+
+		//Music play
+
+		AudioSource audio = GetComponent<AudioSource>();
+
+		audio.Play();
+
+
+
+
 		_sleeperState = State.idle;
 		animator = GetComponent<Animator> ();
 		animator.SetInteger ("AnimState", 0);
