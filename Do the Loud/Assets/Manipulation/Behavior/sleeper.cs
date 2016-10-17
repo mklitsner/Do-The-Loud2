@@ -33,6 +33,7 @@ public class sleeper : MonoBehaviour {
 
 		transform.position = new Vector3 (transform.position.x, floatation, transform.position.z);
 
+		//times how long until they fall asleep
 		sleepTimer -= Time.deltaTime;
 
 		if (_sleeperState == State.idle) {
