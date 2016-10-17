@@ -21,6 +21,8 @@ public class sleeper : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 
+		transform.position = new Vector3 (transform.position.x, 0, transform.position.z);
+
 		sleepTimer -= Time.deltaTime;
 
 		if (_sleeperState == State.idle) {
