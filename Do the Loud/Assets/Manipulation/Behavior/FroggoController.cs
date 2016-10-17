@@ -3,21 +3,86 @@ using System.Collections;
 
 public class FroggoController : MonoBehaviour {
 
-	public float speed=20;
+	public float speed;
 	private Rigidbody rb;
 	bool mouseReleased;
+	private Animator animator;
+	enum State {idle,yell};
+	FroggoController.State _froggoState;
+	public bool voiceActivation;
+
+
+
+	//variables gutted from moveobject
+	public float soundLevel;
+	public bool thresholdBroken;
+	public float threshold=1000;
+	public float force;
+
 	// Use this for initialization
 	void Start () {
 		rb = GetComponent<Rigidbody> ();
+		animator = GetComponent<Animator> ();
+		animator.SetInteger ("AnimState", 0);
+		_froggoState = State.idle;
+
 	}
 	
 	// Update is called once per frame
 	void FixedUpdate () {
-		FroggoRotate ();
-		FroggoPush ();
-	
+		if (voiceActivation == true) {
+			FroggoVoice ();
+		} else {
+			FroggoClick ();
+		}
 
 	}
+
+
+
+	void FroggoVoice(){
+		FroggoRotate ();
+		soundLevel = GetComponent<MicrophoneListener> ().soundLevel;
+		if (soundLevel > threshold && thresholdBroken == false) {
+			thresholdBroken = true;
+			animator.SetInteger ("AnimState", 4);
+			_froggoState=State.yell;
+		}
+		if (soundLevel < threshold && _froggoState==State.yell) {
+			thresholdBroken = false;
+			animator.SetInteger ("AnimState", 0);
+			_froggoState=State.idle;
+		}
+		if(_froggoState==State.idle){
+			FroggoPush ();
+		}
+		
+	}
+
+
+
+
+
+
+		void FroggoClick(){
+			FroggoRotate ();
+			if (Input.GetMouseButtonDown (1)) {
+				animator.SetInteger ("AnimState", 4);
+				_froggoState=State.yell;
+
+			}
+			if (Input.GetMouseButtonUp (1)&&_froggoState==State.yell) {
+				animator.SetInteger ("AnimState", 0);
+				_froggoState=State.idle;
+			}
+			if(_froggoState==State.idle){
+				FroggoPush ();
+			}
+		}
+
+		
+
+
 
 
 
@@ -36,9 +101,11 @@ public class FroggoController : MonoBehaviour {
 		if (Input.GetMouseButtonDown (0)&& mouseReleased) {
 			rb.AddForce(gameObject.transform.up * -speed);
 			mouseReleased = false;
-		}
-		if (Input.GetMouseButtonUp (0)) {
+			animator.SetInteger ("AnimState", 3);
+		}else if (Input.GetMouseButtonUp(0)) {
 			mouseReleased = true;
+			animator.SetInteger ("AnimState", 0);
+			
 		}
 	}
 }

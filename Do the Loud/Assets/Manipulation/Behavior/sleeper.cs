@@ -7,6 +7,8 @@ public class sleeper : MonoBehaviour {
 	private Animator animator;
 	public float sleepTimer;
 	float resistance;
+	float floatation;
+	private SpriteRenderer sprite;
 
 	sleeper.State _sleeperState;
 
@@ -16,12 +18,14 @@ public class sleeper : MonoBehaviour {
 		animator = GetComponent<Animator> ();
 		animator.SetInteger ("AnimState", 0);
 		sleepTimer = Random.Range(50,70);
+		floatation = 0;
+		sprite = GetComponent<SpriteRenderer>();
 	}
 	
 	// Update is called once per frame
 	void Update () {
 
-		transform.position = new Vector3 (transform.position.x, 0, transform.position.z);
+		transform.position = new Vector3 (transform.position.x, floatation, transform.position.z);
 
 		sleepTimer -= Time.deltaTime;
 
@@ -75,8 +79,17 @@ public class sleeper : MonoBehaviour {
 
 		} else if (_sleeperState == State.asleep) {
 			//if sleepTimer goes below 0, fall
+			if (sleepTimer < 0) {
+				floatation = sleepTimer;
+				sprite.sortingLayerName = "Below";
+				if(floatation<-20){
+					Destroy (gameObject);
+				}
+			}
 
-			//if yelled at, reset sleepTimer
+			//if yelled at, reset sleepTimer and wake up
+
+			//if touching partner, wake up
 
 			
 		} else if (_sleeperState == State.enlightened) {
