@@ -7,8 +7,9 @@ public class FroggoController : MonoBehaviour {
 	private Rigidbody rb;
 	bool mouseReleased;
 	private Animator animator;
-	enum State {idle,yell};
-	FroggoController.State _froggoState;
+	 enum State {idle,yell};
+	 FroggoController.State _froggoState;
+	public bool yelling;
 	public bool voiceActivation;
 
 
@@ -47,14 +48,17 @@ public class FroggoController : MonoBehaviour {
 			thresholdBroken = true;
 			animator.SetInteger ("AnimState", 4);
 			_froggoState=State.yell;
+			yelling = true;
 		}
 		if (soundLevel < threshold && _froggoState==State.yell) {
 			thresholdBroken = false;
 			animator.SetInteger ("AnimState", 0);
 			_froggoState=State.idle;
+			yelling = false;
 		}
 		if(_froggoState==State.idle){
 			FroggoPush ();
+			yelling = false;
 		}
 		
 	}
@@ -69,14 +73,17 @@ public class FroggoController : MonoBehaviour {
 			if (Input.GetMouseButtonDown (1)) {
 				animator.SetInteger ("AnimState", 4);
 				_froggoState=State.yell;
+			yelling = true;
 
 			}
 			if (Input.GetMouseButtonUp (1)&&_froggoState==State.yell) {
 				animator.SetInteger ("AnimState", 0);
 				_froggoState=State.idle;
+			yelling = false;
 			}
 			if(_froggoState==State.idle){
 				FroggoPush ();
+			yelling = false;
 			}
 		}
 

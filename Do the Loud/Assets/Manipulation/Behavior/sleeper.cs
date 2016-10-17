@@ -6,9 +6,14 @@ public class sleeper : MonoBehaviour {
 	enum State {asleep,dozing,idle,waking,enlightened};
 	private Animator animator;
 	public float sleepTimer;
+	//wakingTimer counts down from the last time its been yelled at
+	float wakingTimer;
+	public float timerAverageStart;//50
 	float resistance;
 	float floatation;
 	private SpriteRenderer sprite;
+
+	bool yelledAt;
 
 	sleeper.State _sleeperState;
 
@@ -17,8 +22,9 @@ public class sleeper : MonoBehaviour {
 		_sleeperState = State.idle;
 		animator = GetComponent<Animator> ();
 		animator.SetInteger ("AnimState", 0);
-		sleepTimer = Random.Range(50,70);
+		sleepTimer = Random.Range(timerAverageStart,timerAverageStart+20);
 		floatation = 0;
+		resistance = 0;
 		sprite = GetComponent<SpriteRenderer>();
 	}
 	
@@ -33,6 +39,12 @@ public class sleeper : MonoBehaviour {
 			
 
 			//if yelled at, reset sleepTimer, resistance goes up
+			if (yelledAt) {
+				ResetTimer ();
+				resistance += 1;
+				_sleeperState = State.waking;
+
+			}
 
 			//if sleepTimer goes below 20, start dozing
 			if (sleepTimer < 20) {
@@ -43,17 +55,23 @@ public class sleeper : MonoBehaviour {
 			
 
 		} else if (_sleeperState == State.waking) {
-			//depending on resistance, wake up after being yelled at for certain amount of time
 
-			//if not yelled at enough, go back to dozing
+			if (animator.GetCurrentAnimatorStateInfo (0).normalizedTime > 1 && !animator.IsInTransition (0)) {
+				animator.SetInteger ("AnimState", 2);
+			}
+			wakingTimer -= Time.deltaTime;
 
-			// go to idle once point is reached
+			if (wakingTimer<0) {
+				yelledAt = false;
+				_sleeperState = State.idle;
+				animator.SetInteger ("AnimState", 0);
+			}
 
 		} else if (_sleeperState == State.dozing) {
 
 			//gradually switch between idle and dozing, while dozing more frequently as sleepTimer gets closer to 0
 			float sleepiness;
-			sleepiness=Random.Range(0,sleepTimer*sleepTimer);
+			sleepiness = Random.Range (0, sleepTimer * sleepTimer);
 
 			if (sleepiness < 5) {
 				animator.SetInteger ("AnimState", -1);
@@ -65,6 +83,12 @@ public class sleeper : MonoBehaviour {
 
 
 			//if yelled at, reset sleepTimer, go to waking
+			if (yelledAt) {
+				ResetTimer ();
+				resistance += 1;
+				_sleeperState = State.waking;
+
+			}
 
 			//if sleepTimer goes below 5, fall asleep
 			if (sleepTimer < 5) {
@@ -82,13 +106,20 @@ public class sleeper : MonoBehaviour {
 			if (sleepTimer < 0) {
 				floatation = sleepTimer;
 				sprite.sortingLayerName = "Below";
-				if(floatation<-20){
+				if (floatation < -20) {
 					Destroy (gameObject);
 				}
 			}
 
-			//if yelled at, reset sleepTimer and wake up
 
+
+			//if yelled at, reset sleepTimer and wake up
+			if (yelledAt) {
+				ResetTimer ();
+				resistance += 1;
+				_sleeperState = State.waking;
+
+			}
 			//if touching partner, wake up
 
 			
@@ -98,12 +129,25 @@ public class sleeper : MonoBehaviour {
 		} else {
 			//Debug.Log ("sleeper lost state");
 		}
+	}
 
+		void OnTriggerStay(Collider col){
+		if (col.gameObject.name == "Yell_space") {
+			yelledAt = true;
+			wakingTimer = 0.5f;
+			Debug.Log ("yelledAt");
+		}
+	}
+		
+		
 
+	void ResetTimer(){
+		sleepTimer = Random.Range (timerAverageStart - resistance, timerAverageStart+20 - resistance);
+	}
 
 
 
 
 		//Debug.Log (Time.time);
-	}
+	
 }
